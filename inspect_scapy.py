@@ -18,14 +18,25 @@ scapy_version = scapy.config.Conf.version
 print "Scapy Version", scapy_version
 
 packet_subclasses = []
+field_layer_dict = {}
 
 for item in all_scapy_layers:
     if inspect.isclass(item[1]):
         if issubclass(item[1], Packet):
             packet_subclasses.append(item[1])
 
+# Add all the fields into one big list
 all_fields = reduce(lambda x, y: x + y,
                     [pkt_cls.fields_desc for pkt_cls in packet_subclasses])
+
+# Dictionary structure so when we have a specific field, we can see what layer
+# it came from
+for pkt_cls in packet_subclasses:
+    for fld in pkt_cls.fields_desc:
+        if fld not in field_layer_dict:
+            field_layer_dict[fld] = [pkt_cls]
+        else:
+            field_layer_dict[fld].append(pkt_cls)
 
 
 def getFieldCount(all_fields):
@@ -35,6 +46,7 @@ def getFieldCount(all_fields):
     field_count = Counter(all_fields)
 
     return field_count
+
 
 def printNTopFieldNames(field_count, num=None):
     """Print <num> of top field names. None prints all info"""
@@ -52,6 +64,7 @@ def printNTopFieldNames(field_count, num=None):
         for i in s:
             print key, i[0], i[1]
 
+
 def getFieldFmtsCount(all_fields):
     """Count the occurence of different fmts for all of the fields"""
 
@@ -59,16 +72,24 @@ def getFieldFmtsCount(all_fields):
 
     field_fmts_count = Counter(all_fields_fmts)
 
+
 def printFieldFmtsCounts(fields_fmts_count):
     """Print the count information of field formats"""
 
     for n, item in enumerate(field_fmts_count.most_common()):
-        print (n+1), item[0], item[1]
+        print (n + 1), item[0], item[1]
+
+
+def findFieldName(all_fields, name):
+    """Find the occurances of a field with a certain name"""
+
+    for fld in all_fields:
+        if fld.name == name:
+            print fld.name
 
 print "Number of fields in scapy", len(all_fields)
+print "Number of unique scapy fields", len(field_layer_dict)
 
 field_count = getFieldCount(all_fields)
 
 #printNTopFieldNames(field_count)
-
-

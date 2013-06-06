@@ -83,9 +83,11 @@ def printFieldFmtsCounts(fields_fmts_count):
 def findFieldName(all_fields, name):
     """Find the occurances of a field with a certain name"""
 
+    print('Field name, "{0}" in layers -'.format(name))
     for fld in all_fields:
         if fld.name == name:
-            print fld.name
+            for lyr in field_layer_dict[fld]:
+                print "\t", lyr.name, lyr
 
 print "Number of fields in scapy", len(all_fields)
 print "Number of unique scapy fields", len(field_layer_dict)
@@ -93,3 +95,4 @@ print "Number of unique scapy fields", len(field_layer_dict)
 field_count = getFieldCount(all_fields)
 
 #printNTopFieldNames(field_count)
+findFieldName(all_fields, "payload")

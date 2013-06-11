@@ -5,7 +5,7 @@
 Basic script for inspecting various details about SCAPY layers.
 """
 
-
+import argparse
 import inspect
 import scapy.config
 import scapy.layers.all
@@ -77,6 +77,8 @@ def getFieldFmtsCount(all_fields):
 
     field_fmts_count = Counter(all_fields_fmts)
 
+    return field_fmts_count
+
 
 def printFieldFmtsCounts(fields_fmts_count):
     """Print the count information of field formats"""
@@ -94,10 +96,33 @@ def findFieldName(all_fields, name):
             for lyr in field_layer_dict[fld]:
                 print "\t", lyr.name, lyr
 
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-f", "--find-field", action="store", dest="find_field")
+
+parser.add_argument("-pf", "--print-fields-fmt", action="store_true",
+                    dest="print_fields_fmts", default=False)
+
+parser.add_argument("-pt", "--print-top-fields", action="store_true",
+                    dest="print_top_fields", default=False)
+
+parser.add_argument("-n", "--num", action="store", dest="num", default=None,
+                    type=int)
+
+args = parser.parse_args()
+
 print "Number of fields in scapy", len(all_fields)
 print "Number of unique scapy fields", len(field_layer_dict)
 
 fld_count = getFieldCount(all_fields)
 
-#printNTopFieldNames(field_count)
-findFieldName(all_fields, "payload")
+if args.find_field:
+    findFieldName(all_fields, args.find_field)
+
+if args.print_top_fields:
+    printNTopFieldNames(fld_count, args.num)
+
+if args.print_fields_fmts:
+    flds_fmts = getFieldFmtsCount(all_fields)
+    printFieldFmtsCounts(flds_fmts)

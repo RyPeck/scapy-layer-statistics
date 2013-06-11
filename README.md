@@ -1,7 +1,7 @@
 scapy-layer-statistics
 ======================
 
-Retrieves statistics from the installed scapy module about the layers implemented.
+Retrieves statistics from the installed scapy module about the layers implemented. Right now it retrieves information about naming conventions on specific layers. Goal is to create something that is able to go through previous versions of scapy and learn collect data about the number of fields, layers, etc.
 
 ToDo
 -------

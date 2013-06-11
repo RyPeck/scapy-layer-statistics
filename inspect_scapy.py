@@ -1,15 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+Basic script for inspecting various details about SCAPY layers.
+"""
+
+
 import inspect
+import scapy.config
 import scapy.layers.all
+
 from collections import Counter
 
 all_scapy_layers = inspect.getmembers(scapy.layers.all)
 
 from scapy.packet import Packet
-
-import scapy.config
 
 from operator import itemgetter
 
@@ -20,10 +25,10 @@ print "Scapy Version", scapy_version
 packet_subclasses = []
 field_layer_dict = {}
 
-for item in all_scapy_layers:
-    if inspect.isclass(item[1]):
-        if issubclass(item[1], Packet):
-            packet_subclasses.append(item[1])
+for lyr in all_scapy_layers:
+    if inspect.isclass(lyr[1]):
+        if issubclass(lyr[1], Packet):
+            packet_subclasses.append(lyr[1])
 
 # Add all the fields into one big list
 all_fields = reduce(lambda x, y: x + y,
@@ -39,11 +44,11 @@ for pkt_cls in packet_subclasses:
             field_layer_dict[fld].append(pkt_cls)
 
 
-def getFieldCount(all_fields):
+def getFieldCount(fields):
     """Count the occurence of each field name, return dictionary with tally"""
 
     # This has repeats of the names for some reason
-    field_count = Counter(all_fields)
+    field_count = Counter(fields)
 
     return field_count
 
@@ -53,7 +58,7 @@ def printNTopFieldNames(field_count, num=None):
 
     flds = {}
 
-    for n, item in enumerate(field_count.most_common(num)):
+    for item in field_count.most_common(num):
         if item[1] not in flds:
             flds[item[1]] = [[item[0].name, item]]
         else:
@@ -76,7 +81,7 @@ def getFieldFmtsCount(all_fields):
 def printFieldFmtsCounts(fields_fmts_count):
     """Print the count information of field formats"""
 
-    for n, item in enumerate(field_fmts_count.most_common()):
+    for n, item in enumerate(fields_fmts_count.most_common()):
         print (n + 1), item[0], item[1]
 
 
@@ -92,7 +97,7 @@ def findFieldName(all_fields, name):
 print "Number of fields in scapy", len(all_fields)
 print "Number of unique scapy fields", len(field_layer_dict)
 
-field_count = getFieldCount(all_fields)
+fld_count = getFieldCount(all_fields)
 
 #printNTopFieldNames(field_count)
 findFieldName(all_fields, "payload")
